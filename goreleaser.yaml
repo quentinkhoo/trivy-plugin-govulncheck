@@ -1,0 +1,28 @@
+version: 2
+project_name: trivy_plugin_govulncheck
+
+builds:
+  -
+    main: .
+    binary: govulncheck
+    ldflags:
+      - -s -w
+      - "-extldflags '-static'"
+      - -X main.version={{.Version}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  -
+    formats:
+      - tar.gz
+    name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
+    files:
+      - plugin.yaml
+      - LICENSE

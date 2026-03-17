@@ -1,0 +1,27 @@
+name: govulncheck
+repository: github.com/quentinkhoo/trivy-plugin-govulncheck
+version: "0.1.0"
+usage: trivy govulncheck image <ref>
+description: |-
+  Govulncheck is a vulnerability checker for Go modules. It uses the Go module graph and the Go vulnerability database to check for vulnerabilities in Go modules. 
+platforms:
+  - selector:
+      os: darwin
+      arch: amd64
+    uri: https://github.com/quentinkhoo/trivy-plugin-govulncheck/releases/download/v0.1.0/trivy-plugin-govulncheck_0.1.0_darwin-amd64.tar.gz
+    bin: ./trivy-plugin-govulncheck
+  - selector:
+      os: darwin
+      arch: arm64
+    uri: https://github.com/quentinkhoo/trivy-plugin-govulncheck/releases/download/v0.1.0/trivy-plugin-govulncheck_0.1.0_darwin-arm64.tar.gz
+    bin: ./trivy-plugin-govulncheck
+  - selector:
+      os: linux
+      arch: amd64
+    uri: https://github.com/quentinkhoo/trivy-plugin-govulncheck/releases/download/v0.1.0/trivy-plugin-govulncheck_0.1.0_linux-amd64.tar.gz
+    bin: ./trivy-plugin-govulncheck
+  - selector:
+      os: linux
+      arch: arm64
+    uri: https://github.com/quentinkhoo/trivy-plugin-govulncheck/releases/download/v0.1.0/trivy-plugin-govulncheck_0.1.0_linux-arm64.tar.gz
+    bin: ./trivy-plugin-govulncheck
