@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"context"
 
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/image"
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/trivy"
+	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/govulncheck"
 )
 
 const usage = `Usage: trivy govulncheck image <ref>
@@ -57,6 +59,23 @@ func main() {
 
 	for target, localPath := range binaries {
 		fmt.Printf("extracted: %s -> %s\n", target, localPath)
+	}
+
+	// Run govulncheck on each extracted binary
+	ctx := context.Background()
+	reachableVulns := make(map[string]map[string]bool) // a map of binary -> CVE -> reachable
+	for target, localPath := range binaries {
+		vulns, err := govulncheck.RunGovulncheck(ctx, localPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			continue
+		}
+		reachableVulns[target] = vulns
+	}
+
+	// Print the results
+	for target, vulns := range reachableVulns {
+		fmt.Printf("%s: %v\n", target, vulns) 
 	}
 
 	// Finally lets cleanup the temp directory storing the extracted binaries.
