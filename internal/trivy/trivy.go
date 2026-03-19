@@ -53,8 +53,11 @@ type Vulnerability struct {
 // Run an internal Trivy command to scan the user-input imageRef and return the parsed report.
 // Instead of calling the Trivy library directly, we shell out to the CLI to avoid any issues with vendoring or API stability. This also allows us to use the same Trivy binary that the user has installed, which may be more up-to-date than any vendored version.
 // Also, easier to implement hehehe
-func RunTrivy(ref string) (*Report, error) {
-	cmd := exec.Command("trivy", "image", "--format", "json", "--quiet", ref)
+// We forward the extra flags that a user might've called with the trivy
+func RunTrivy(ref string, extraArgs []string) (*Report, error) {
+	args := append([]string{"image", "--format", "json", "--quiet"}, extraArgs...)
+	args = append(args, ref)
+	cmd := exec.Command("trivy", args...)
 	out, err := cmd.Output()
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {

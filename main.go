@@ -12,28 +12,35 @@ import (
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/govulncheck"
 )
 
-const usage = `Usage: trivy govulncheck image <ref>
-
-Commands:
-  image <ref>    Scan a container image for reachable Go vulnerabilities
-
-Examples:
-  trivy govulncheck image grafana/beyla:2.7.11
-`
+const usage = `Usage: trivy govulncheck --image <ref> [-- <trivy flags>]
+                                                                          
+  Examples:                                                                                                     
+    trivy govulncheck --image grafana/beyla:2.7.11                                                              
+    trivy govulncheck --image grafana/beyla:2.7.11 -- --severity CRITICAL,HIGH --ignore-unfixed                 
+  `
 
 func main() {
-	args := os.Args[1:]
+	args := os.Args[1:]                                                                                           
+                                                                                                                
+  var ref string                                                                                                
+  var extraArgs []string                                                                                        
+                                                                                                                
+  for i := 0; i < len(args); i++ {                                                                              
+      if args[i] == "--image" && i+1 < len(args) {                                                              
+          ref = args[i+1]                                                                                       
+          i++                                                                                                   
+      } else if args[i] == "--" {                                                                               
+          extraArgs = args[i+1:]                                                                                
+          break                                                                                                 
+      }                                                 
+  }    
+   
+  if ref == "" {                                                                                                
+      fmt.Fprint(os.Stderr, usage)
+      os.Exit(1)                                                                                                
+  }
 
-	// To mimic the `trivy image` subcommand structure.
-	if len(args) < 2 || args[0] != "image" {
-		fmt.Fprint(os.Stderr, usage)
-		os.Exit(1)
-	}
-
-	ref := args[1]
-	fmt.Fprintf(os.Stderr, "scanning %s...\n", ref)
-
-	report, err := trivy.RunTrivy(ref)
+	report, err := trivy.RunTrivy(ref, extraArgs)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
