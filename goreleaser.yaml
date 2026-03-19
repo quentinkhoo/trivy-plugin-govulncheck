@@ -25,4 +25,3 @@ archives:
     name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}-{{.Arch}}"
     files:
       - plugin.yaml
-      - LICENSE
