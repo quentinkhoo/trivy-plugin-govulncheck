@@ -6,50 +6,49 @@ import (
 	"os/exec"
 )
 
-// We really only care about the "gobinary" results, but we define enough of the structure to parse the Trivy JSON output.
-// https://pkg.go.dev/github.com/aquasecurity/trivy/pkg/types#Report
 type Report struct {
-	SchemaVersion int      `json:"SchemaVersion"`
-	ArtifactName  string   `json:"ArtifactName"`
-	ArtifactType  string   `json:"ArtifactType"`
-	Metadata      Metadata `json:"Metadata"`
-	Results       []Result `json:"Results"`
+	SchemaVersion int             `json:"SchemaVersion"`                                                    
+	Trivy         json.RawMessage `json:"Trivy,omitempty"`
+	ReportID      string          `json:"ReportID,omitempty"`                                               
+	CreatedAt     string          `json:"CreatedAt,omitempty"`
+	ArtifactID    string          `json:"ArtifactID,omitempty"`                                             
+	ArtifactName  string          `json:"ArtifactName"`                                                     
+	ArtifactType  string          `json:"ArtifactType"`
+	Metadata      json.RawMessage `json:"Metadata"`                                                         
+	Results       []Result        `json:"Results"`                                                          
 }
 
-type Metadata struct {
-	OS          *OS          `json:"OS,omitempty"`
-	ImageConfig *ImageConfig `json:"ImageConfig,omitempty"`
-}
-
-type OS struct {
-	Family string `json:"Family"`
-	Name   string `json:"Name"`
-}
-
-type ImageConfig struct {
-	Architecture string `json:"architecture,omitempty"`
-	OS           string `json:"os,omitempty"`
-}
-
-// Result represents one scanned target (e.g. a gobinary or OS package layer).
+// Result represents one scanned target (e.g. a gobinary or OS package layer).                                      
 type Result struct {
-	Target          string          `json:"Target"`
-	Class           string          `json:"Class"`
-	Type            string          `json:"Type"`
-	Vulnerabilities []Vulnerability `json:"Vulnerabilities,omitempty"`
-}
+	Target          string            `json:"Target"`
+	Class           string            `json:"Class"` 
+	Type            string            `json:"Type"`                                                         
+	Vulnerabilities []json.RawMessage `json:"Vulnerabilities,omitempty"`
+} 
 
 // Vulnerability is a single CVE finding within a Result.
 type Vulnerability struct {
-	VulnerabilityID  string   `json:"VulnerabilityID"`
-	PkgName          string   `json:"PkgName"`
-	InstalledVersion string   `json:"InstalledVersion"`
-	FixedVersion     string   `json:"FixedVersion,omitempty"`
-	Title            string   `json:"Title,omitempty"`
-	Description      string   `json:"Description,omitempty"`
-	Severity         string   `json:"Severity"`
-	References       []string `json:"References,omitempty"`
-}
+	VulnerabilityID  string              `json:"VulnerabilityID"`
+	VendorIDs        []string            `json:"VendorIDs,omitempty"`
+	PkgID            string              `json:"PkgID,omitempty"`
+	PkgName          string              `json:"PkgName"`
+	PkgIdentifier    json.RawMessage     `json:"PkgIdentifier,omitempty"`
+	InstalledVersion string              `json:"InstalledVersion"`
+	FixedVersion     string              `json:"FixedVersion,omitempty"`
+	Status           string              `json:"Status,omitempty"`
+	Layer            json.RawMessage     `json:"Layer,omitempty"`
+	PrimaryURL       string              `json:"PrimaryURL,omitempty"`
+	DataSource       json.RawMessage     `json:"DataSource,omitempty"`
+	Fingerprint      string              `json:"Fingerprint,omitempty"`
+	Title            string              `json:"Title,omitempty"`
+	Description      string              `json:"Description,omitempty"`
+	Severity         string              `json:"Severity"`
+	VendorSeverity   json.RawMessage     `json:"VendorSeverity,omitempty"`
+	CVSS             json.RawMessage     `json:"CVSS,omitempty"`
+	References       []string            `json:"References,omitempty"`
+	PublishedDate    string              `json:"PublishedDate,omitempty"`
+	LastModifiedDate string              `json:"LastModifiedDate,omitempty"`
+  }
 
 // Run an internal Trivy command to scan the user-input imageRef and return the parsed report.
 // Instead of calling the Trivy library directly, we shell out to the CLI to avoid any issues with vendoring or API stability. This also allows us to use the same Trivy binary that the user has installed, which may be more up-to-date than any vendored version.

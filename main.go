@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"context"
+	"encoding/json"
 
+	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/filter"
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/image"
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/trivy"
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/govulncheck"
@@ -57,10 +59,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	for target, localPath := range binaries {
-		fmt.Printf("extracted: %s -> %s\n", target, localPath)
-	}
-
 	// Run govulncheck on each extracted binary
 	ctx := context.Background()
 	reachableVulns := make(map[string]map[string]bool) // a map of binary -> CVE -> reachable
@@ -74,10 +72,14 @@ func main() {
 	}
 
 	// Print the results
-	for target, vulns := range reachableVulns {
-		fmt.Printf("%s: %v\n", target, vulns) 
+	report.Results = filter.FilterResults(report.Results, reachableVulns)
+	out, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
 	}
+	fmt.Println(string(out))
 
 	// Finally lets cleanup the temp directory storing the extracted binaries.
-	//image.CleanupTempDir()
+	image.CleanupTempDir()
 }

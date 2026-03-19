@@ -3,7 +3,7 @@ repository: github.com/quentinkhoo/trivy-plugin-govulncheck
 version: "0.1.0"
 usage: trivy govulncheck image <ref>
 description: |-
-  Govulncheck is a vulnerability checker for Go modules. It uses the Go module graph and the Go vulnerability database to check for vulnerabilities in Go modules. 
+  Integrate Govulncheck into your Trivy Scan, removing false positives detected by Govulncheck.
 platforms:
   - selector:
       os: darwin
