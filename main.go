@@ -56,8 +56,14 @@ func main() {
 		}
 	}
 
+	// If there are no Go binaries found, we can skip the govulncheck step and just print the original report
 	if len(targets) == 0 {
-		fmt.Fprintln(os.Stderr, "no Go binaries found in image")
+		out, err := json.MarshalIndent(report, "", "  ")                                                          
+		if err != nil {                                                                                           
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)                                                            
+			os.Exit(1)                                    
+		}                                       
+		fmt.Println(string(out))            
 		os.Exit(0)
 	}
 
