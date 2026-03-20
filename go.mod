@@ -1,4 +1,4 @@
-module github.com/quentinkhoo/trivy-plugin-govulncheck
+module trivy-plugin-govulncheck
 
 go 1.26.1
 

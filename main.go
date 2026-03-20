@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/filter"
-	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/govulncheck"
-	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/image"
-	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/trivy"
+	"trivy-plugin-govulncheck/internal/filter"
+	"trivy-plugin-govulncheck/internal/govulncheck"
+	"trivy-plugin-govulncheck/internal/image"
+	"trivy-plugin-govulncheck/internal/trivy"
 )
 
 const usage = `Usage: trivy govulncheck --image <ref> [trivy flags]

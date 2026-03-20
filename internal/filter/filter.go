@@ -3,7 +3,7 @@ package filter
 import (
 	"encoding/json"
 
-	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/trivy"
+	"trivy-plugin-govulncheck/internal/trivy"
 )
 
 // Given the original Trivy results and the map of reachableVulns, filter out the false positives
