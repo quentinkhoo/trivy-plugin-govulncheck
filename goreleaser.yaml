@@ -1,10 +1,10 @@
 version: 2
-project_name: trivy_plugin_govulncheck
+project_name: trivy-plugin-govulncheck
 
 builds:
   -
     main: .
-    binary: govulncheck
+    binary: trivy-plugin-govulncheck
     ldflags:
       - -s -w
       - "-extldflags '-static'"
