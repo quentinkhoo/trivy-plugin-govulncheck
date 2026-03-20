@@ -1,44 +1,46 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"context"
 	"encoding/json"
+	"fmt"
+	"os"
 
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/filter"
+	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/govulncheck"
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/image"
 	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/trivy"
-	"github.com/quentinkhoo/trivy-plugin-govulncheck/internal/govulncheck"
 )
 
-const usage = `Usage: trivy govulncheck --image <ref> [-- <trivy flags>]
-                                                                          
-  Examples:                                                                                                     
-    trivy govulncheck --image grafana/beyla:2.7.11                                                              
-    trivy govulncheck --image grafana/beyla:2.7.11 -- --severity CRITICAL,HIGH --ignore-unfixed                 
+const usage = `Usage: trivy govulncheck --image <ref> [trivy flags]
+
+  Examples:
+    trivy govulncheck --image grafana/beyla:2.7.11
+    trivy govulncheck --image grafana/beyla:2.7.11 --severity CRITICAL,HIGH --ignore-unfixed
   `
 
 func main() {
-	args := os.Args[1:]                                                                                           
-                                                                                                                
-  var ref string                                                                                                
-  var extraArgs []string                                                                                        
-                                                                                                                
-  for i := 0; i < len(args); i++ {                                                                              
-      if args[i] == "--image" && i+1 < len(args) {                                                              
-          ref = args[i+1]                                                                                       
-          i++                                                                                                   
-      } else if args[i] == "--" {                                                                               
-          extraArgs = args[i+1:]                                                                                
-          break                                                                                                 
-      }                                                 
-  }    
-   
-  if ref == "" {                                                                                                
-      fmt.Fprint(os.Stderr, usage)
-      os.Exit(1)                                                                                                
-  }
+	args := os.Args[1:]
+
+	var ref string
+	var extraArgs []string
+
+	for i := 0; i < len(args); i++ {
+		if args[i] == "--image" && i+1 < len(args) {
+			ref = args[i+1]
+			i++
+		} else if args[i] == "--" {
+			extraArgs = append(extraArgs, args[i+1:]...)
+			break
+		} else {
+			extraArgs = append(extraArgs, args[i])
+		}
+	}
+
+	if ref == "" {
+		fmt.Fprint(os.Stderr, usage)
+		os.Exit(1)
+	}
 
 	report, err := trivy.RunTrivy(ref, extraArgs)
 	if err != nil {
